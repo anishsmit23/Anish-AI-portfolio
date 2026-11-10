@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 551 723" role="img" aria-label="Lively voice agent home screen with pixel smile and Begin Call button">
+  <rect width="551" height="723" fill="#f4f3ef"/>
+  <g fill="#1d1d1d">
+    <path d="M192 254h45v53h-47z"/>
+    <path d="M286 256h45v53h-47z"/>
+    <path d="M134 354h28v28h-29z"/>
+    <path d="M161 382h28v28h-28z"/>
+    <path d="M188 410h139v31H188z"/>
+    <path d="M327 386h29v28h-29z"/>
+    <path d="M356 359h28v28h-28z"/>
+  </g>
+  <rect x="146.5" y="474.5" width="227" height="80" fill="none" stroke="#1d1d1d"/>
+  <g transform="translate(187 507)" fill="none" stroke="#1d1d1d" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 1.5c-.6 0-1 .5-1 1.1 0 7.4 6 13.4 13.4 13.4.6 0 1.1-.4 1.1-1v-2.8c0-.5-.3-.9-.8-1l-3.1-.7c-.4-.1-.8 0-1.1.3l-1.3 1.3A11 11 0 0 1 4.4 7.3L5.7 6c.3-.3.4-.7.3-1.1l-.7-3.1c-.1-.5-.5-.8-1-.8z"/>
+  </g>
+  <text x="214" y="520" fill="#111" font-family="Arial, Helvetica, sans-serif" font-size="16" letter-spacing="3" font-weight="600">BEGIN CALL</text>
+</svg>

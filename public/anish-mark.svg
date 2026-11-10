@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 540" role="img" aria-label="Anish monogram logo">
+  <rect width="540" height="540" fill="#202020"/>
+  <g fill="#fff">
+    <!-- The solid right stroke and pointed lower leg of the A. -->
+    <path d="M270 118 334 196 300 176 442 405 302 300 345 315 317 265 270 177Z"/>
+    <!-- A narrow crossbar, separated from the dark counter above it. -->
+    <path d="M220 261h98l2 4H220z"/>
+    <!-- Small upper-left cut of the monogram. -->
+    <path d="m270 118-64 78 40-29-27 30 24-25-38 24z"/>
+  </g>
+  <g fill="none" stroke="#fff" stroke-linecap="square" stroke-linejoin="miter">
+    <!-- Fine left edge and the long, sharp lower-left slash. -->
+    <path d="M270 118 98 405 238 301 191 315 220 261" stroke-width="1.4"/>
+    <path d="M98 405 230 242 270 177" stroke-width="1"/>
+    <path d="M230 242h75" stroke-width="1"/>
+  </g>
+  <!-- The four-point glint at the crossing of the left stroke and bar. -->
+  <path d="m230 225 2.1 14.9L247 242l-14.9 2.1L230 259l-2.1-14.9L213 242l14.9-2.1z" fill="#fff"/>
+</svg>

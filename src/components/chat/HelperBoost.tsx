@@ -1,0 +1,399 @@
+/**
+ * HelperBoost.tsx – Quick-question chips + inspiration drawer
+ * Row of one-click prompt chips above the composer plus a vaul drawer of
+ * categorized prompts. Every click forwards the prompt string to the parent's
+ * submitQuery(), which appends it as a user message and streams the answer.
+ */
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@radix-ui/react-tooltip';
+import { motion } from 'framer-motion';
+import {
+  BriefcaseBusiness,
+  BriefcaseIcon,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
+  CircleEllipsis,
+  CodeIcon,
+  GraduationCapIcon,
+  Laugh,
+  Layers,
+  MailIcon,
+  PartyPopper,
+  Sparkles,
+  UserRoundSearch,
+  UserSearch,
+} from 'lucide-react';
+import { useState } from 'react';
+import { Drawer } from 'vaul';
+
+interface HelperBoostProps {
+  submitQuery?: (query: string) => void;
+  setInput?: (value: string) => void;
+}
+
+// Chip label → the exact prompt submitted when that quick-question is clicked.
+const questions = {
+  Me: 'Who are you? I want to know more about you.',
+  Projects: 'Show me your project cards.',
+  Skills: 'What are your skills? Give me a list of your soft and hard skills.',
+  Experience: 'Tell me about your AI/ML experience and the systems you build.',
+  Contact:
+    'How can I reach you about AI/ML opportunities?',
+};
+
+// Visual config for the chip row: label key, accent color and icon per chip.
+const questionConfig = [
+  { key: 'Me', color: '#329696', icon: Laugh },
+  { key: 'Projects', color: '#3E9858', icon: BriefcaseBusiness },
+  { key: 'Skills', color: '#856ED9', icon: Layers },
+  { key: 'Experience', color: '#B95F9D', icon: PartyPopper },
+  { key: 'Contact', color: '#C19433', icon: UserRoundSearch },
+];
+
+// Helper drawer data
+// Prompts flagged as "featured": rendered with inverted styling + sparkles.
+const specialQuestions = [
+  'Tell me about your AI/ML experience.',
+  'Who are you?',
+  'Can I see your resume?',
+  'What projects are you most proud of?',
+  'What are your skills?',
+  'How can I reach you?',
+  'What kind of AI systems do you build?',
+];
+
+// Drawer content: the same prompts grouped into browsable categories.
+const questionsByCategory = [
+  {
+    id: 'me',
+    name: 'Me',
+    icon: UserSearch,
+    questions: [
+      'Who are you?',
+      'What do you work on?',
+      'What is your educational background?',
+      'What are your achievements?',
+    ],
+  },
+  {
+    id: 'professional',
+    name: 'Professional',
+    icon: BriefcaseIcon,
+    questions: [
+      'Can I see your resume?',
+      'What makes you a valuable team member?',
+      'Where are you working now?',
+      'Why should I hire you?',
+      "What's your educational background?",
+    ],
+  },
+  {
+    id: 'projects',
+    name: 'Projects',
+    icon: CodeIcon,
+    questions: ['Explain all your projects.', 'What projects are you most proud of?', 'Show me the project cards.'],
+  },
+  {
+    id: 'skills',
+    name: 'Skills',
+    icon: GraduationCapIcon,
+    questions: [
+      'What are your skills?',
+      'What did you study at Sikkim Manipal Institute of Technology?',
+    ],
+  },
+  {
+    id: 'experience',
+    name: 'Experience',
+    icon: PartyPopper,
+    questions: [
+      'What kind of AI systems do you build?',
+      'Tell me about your AI/ML experience.',
+      'What AI tools have you used?',
+      'What did you build at ElectraWireless?',
+    ],
+  },
+  {
+    id: 'contact',
+    name: 'Contact & Future',
+    icon: MailIcon,
+    questions: [
+      'How can I reach you?',
+      'What roles match your experience?',
+      'Where are you located?',
+    ],
+  },
+];
+
+// Animated Chevron component
+const AnimatedChevron = () => {
+  return (
+    <motion.div
+      animate={{
+        y: [0, -4, 0], // Subtle up and down motion
+      }}
+      transition={{
+        duration: 1.5,
+        ease: 'easeInOut',
+        repeat: Infinity,
+        repeatType: 'loop',
+      }}
+      className="text-primary mb-1.5"
+    >
+      <ChevronUp size={16} />
+    </motion.div>
+  );
+};
+
+/**
+ * Quick-question UI beneath the chat composer.
+ * @param submitQuery – forwards a ready-made prompt to chat.tsx for streaming
+ * @param setInput – optional hook to write into the composer's input value
+ */
+export default function HelperBoost({
+  submitQuery,
+  setInput,
+}: HelperBoostProps) {
+  // Chip row expand/collapse (starts expanded).
+  const [isVisible, setIsVisible] = useState(true);
+  // vaul Drawer open state for the "more questions" bottom sheet.
+  const [open, setOpen] = useState(false);
+
+  // Chips submit the canned prompt stored under their label in `questions`.
+  const handleQuestionClick = (questionKey: string) => {
+    if (submitQuery) {
+      submitQuery(questions[questionKey as keyof typeof questions]);
+    }
+  };
+
+  // Drawer submits the chosen prompt and immediately dismisses the sheet.
+  const handleDrawerQuestionClick = (question: string) => {
+    if (submitQuery) {
+      submitQuery(question);
+    }
+    setOpen(false);
+  };
+
+  const toggleVisibility = () => {
+    setIsVisible(!isVisible);
+  };
+
+  return (
+    <>
+      <Drawer.Root open={open} onOpenChange={setOpen}>
+        <div className="w-full">
+          {/* Toggle Button */}
+          <div
+            className={
+              isVisible
+                ? 'mb-2 flex justify-center'
+                : 'mb-0 flex justify-center'
+            }
+          >
+            {/* Collapses/expands the chip row below. */}
+            <button
+              onClick={toggleVisibility}
+              className="text-muted-foreground hover:text-foreground flex items-center gap-1 px-3 py-1 text-xs transition-colors"
+            >
+              {isVisible ? (
+                <>
+                  <ChevronDown size={14} />
+                  Hide quick questions
+                </>
+              ) : (
+                <>
+                  <ChevronUp size={14} />
+                  Show quick questions
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* HelperBoost Content */}
+          {isVisible && (
+            <div className="w-full">
+              <div
+                className="flex w-full flex-wrap gap-1 md:gap-3"
+                style={{ justifyContent: 'safe center' }}
+              >
+                {questionConfig.map(({ key, color, icon: Icon }) => (
+                  <Button
+                    key={key}
+                    onClick={() => handleQuestionClick(key)}
+                    variant="outline"
+                    className="border-border bg-card text-card-foreground hover:bg-accent h-auto min-w-[100px] flex-shrink-0 cursor-pointer rounded-xl border px-4 py-3 shadow-none transition-colors active:scale-95"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon size={18} strokeWidth={2} color={color} />
+                      <span className="text-sm font-medium">{key}</span>
+                    </div>
+                  </Button>
+                ))}
+
+                {/* Need Inspiration Button */}
+                <TooltipProvider>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger asChild>
+                      <Drawer.Trigger className="group relative flex flex-shrink-0 items-center justify-center">
+                        <motion.div
+                          className="border-border bg-card text-card-foreground hover:bg-accent flex h-auto cursor-pointer items-center space-x-1 rounded-xl border px-4 py-3 text-sm transition-colors duration-200"
+                          whileHover={{ scale: 1 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <CircleEllipsis
+                              className="h-[20px] w-[18px]"
+                              //style={{ color: '#3B82F6' }}
+                              strokeWidth={2}
+                            />
+                            {/*<span className="text-sm font-medium">More</span>*/}
+                          </div>
+                        </motion.div>
+                      </Drawer.Trigger>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <AnimatedChevron />
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Drawer Content */}
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 z-100 bg-black/60 backdrop-blur-xs" />
+          <Drawer.Content className="bg-background fixed right-0 bottom-0 left-0 z-100 mt-24 flex h-[80%] flex-col rounded-t-[10px] outline-none lg:h-[60%]">
+            <div className="bg-background flex-1 overflow-y-auto rounded-t-[10px] p-4">
+              <div className="mx-auto max-w-md space-y-4">
+                <div
+                  aria-hidden
+                  className="bg-muted mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full"
+                />
+                <div className="mx-auto w-full max-w-md">
+                  <div className="space-y-8 pb-16">
+                    {questionsByCategory.map((category) => (
+                      <CategorySection
+                        key={category.id}
+                        name={category.name}
+                        Icon={category.icon}
+                        questions={category.questions}
+                        onQuestionClick={handleDrawerQuestionClick}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+    </>
+  );
+}
+
+// Component for each category section
+interface CategorySectionProps {
+  name: string;
+  Icon: React.ElementType;
+  questions: string[];
+  onQuestionClick: (question: string) => void;
+}
+
+function CategorySection({
+  name,
+  Icon,
+  questions,
+  onQuestionClick,
+}: CategorySectionProps) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2.5 px-1">
+        <Icon className="h-5 w-5" />
+        <Drawer.Title className="text-foreground text-[22px] font-medium">
+          {name}
+        </Drawer.Title>
+      </div>
+
+      <Separator className="my-4" />
+
+      <div className="space-y-3">
+        {questions.map((question, index) => (
+          <QuestionItem
+            key={index}
+            question={question}
+            onClick={() => onQuestionClick(question)}
+            isSpecial={specialQuestions.includes(question)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Component for each question item with animated chevron
+interface QuestionItemProps {
+  question: string;
+  onClick: () => void;
+  isSpecial: boolean;
+}
+
+function QuestionItem({ question, onClick, isSpecial }: QuestionItemProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    // Featured ("special") questions get inverted colors plus a sparkles icon;
+    // hover state below only drives the chevron nudge animation.
+    <motion.button
+      className={cn(
+        'flex w-full items-center justify-between rounded-[10px]',
+        'text-md px-6 py-4 text-left font-normal',
+        'transition-all',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
+        isSpecial ? 'bg-foreground text-background' : 'bg-secondary text-secondary-foreground'
+      )}
+      onClick={onClick}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      whileHover={{
+        opacity: 0.88,
+      }}
+      whileTap={{
+        scale: 0.98,
+        opacity: 0.75,
+      }}
+    >
+      <div className="flex items-center">
+        {isSpecial && <Sparkles className="mr-2 h-4 w-4" />}
+        <span className={isSpecial ? 'font-medium' : ''}>
+          {question}
+        </span>
+      </div>
+      {/* Spring-animated chevron nudges 4px to the right while hovered. */}
+      <motion.div
+        animate={{ x: isHovered ? 4 : 0 }}
+        transition={{
+          type: 'spring',
+          stiffness: 400,
+          damping: 25,
+        }}
+      >
+        <ChevronRight
+          className={cn(
+            'h-5 w-5 shrink-0',
+            isSpecial ? 'text-background' : 'text-primary'
+          )}
+        />
+      </motion.div>
+    </motion.button>
+  );
+}
